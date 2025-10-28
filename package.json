@@ -1,0 +1,13 @@
+{
+  "name": "practica-vercel-ci",
+  "version": "1.0.0",
+  "description": "Práctica de CI/CD con GitHub Actions y Vercel.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo 'Pruebas unitarias de ejemplo: OK' && exit 0",
+    "docs": "jsdoc script.js -d docs"
+  },
+  "dependencies": {
+    "jsdoc": "^4.0.0"
+  }
+}
