@@ -47,12 +47,16 @@ jobs:
 
       # Requisito 2: Ejecutar Pruebas Unitarias
       - name: Ejecutar Pruebas Unitarias
-        # Usamos 'npm run test' para una ejecución más robusta
+        # Usamos 'npm run test' para una ejecución robusta (resolviendo exit code 127 anterior)
         run: npm run test
 
       # ------------------------------------
       # 3. DOCUMENTACIÓN (Generación)
       # ------------------------------------
+
+      # FIX CRÍTICO: Resuelve el error de 'Permission denied' para jsdoc
+      - name: Asignar Permisos a JSDoc
+        run: chmod +x node_modules/.bin/jsdoc
 
       # Requisito 3 & 4: Generar la documentación HTML con JSDoc
       - name: Generar la documentación (carpeta 'docs')
@@ -63,4 +67,13 @@ jobs:
       # 4. DESPLIEGUE (CD)
       # ------------------------------------
 
-      # Re
+      # Requisito 5: Desplegar automáticamente en Vercel
+      - name: Despliegue en Vercel (Solo carpeta DOCS)
+        uses: amondnet/vercel-action@v25
+        with:
+          # ACCESO CORRECTO A SECRETS: Siempre por su nombre exacto
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # ¡CRÍTICO! Apuntamos el despliegue a la carpeta 'docs' generada.
+          working-directory: ./docs
