@@ -70,9 +70,11 @@ jobs:
       - name: Despliegue en Vercel
         uses: amondnet/vercel-action@v25
         with:
-          # VERCEL_TOKEN debe ser configurado como Secret en GitHub
-          vercel-token: ${{ secrets.VERCEL_TOKEN }} 
-          vercel-org-id: ${{ env.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
+          # VERCEL_TOKEN: Está bien, ya que apuntas directamente al secret.
+          vercel-token: ${{ secrets.6Zd8L2p4kY6vrWmI5fb7hyno }} 
+          # CORREGIDO: Usamos el nombre de la variable de entorno, no el valor directo
+          vercel-org-id: ${{ env.Thih5mJ5Gc62a4nRh4VrGWtI }}
+          # CORREGIDO: Usamos el nombre de la variable de entorno, no el valor directo
+          vercel-project-id: ${{ env.prj_hDomlRZKqb95DkamsmK5AVNSKzx1 }}
           # El despliegue de Vercel debe apuntar a la carpeta base del proyecto
           working-directory: ./
