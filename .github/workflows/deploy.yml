@@ -1,0 +1,78 @@
+name: CI/CD - Documentación y Despliegue en Vercel
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  ci-cd-pipeline:
+    runs-on: ubuntu-latest
+    
+    # Define variables de entorno para Vercel (deben coincidir con tus IDs)
+    env:
+      # Estos IDs deben obtenerse de la configuración de tu proyecto en Vercel
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }} 
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }} 
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      # Paso 1: Instalar Node.js y dependencias
+      - name: Configurar Node.js y Cachear
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm' 
+
+      - name: Instalar dependencias (incluyendo JSDoc)
+        run: npm install
+
+      # ------------------------------------
+      # 2. VERIFICACIÓN Y PRUEBAS (CI)
+      # ------------------------------------
+
+      # Requisito 1: Verificar que la página contiene JavaScript (script.js)
+      - name: Verificar la presencia de código JS
+        run: |
+          if [ -f script.js ]; then
+            echo "::notice file=script.js::El archivo script.js existe. Continuamos."
+          else
+            echo "::error file=script.js::Error: El proyecto requiere el archivo script.js."
+            exit 1 # Detiene el flujo si no existe el archivo clave
+          fi
+          
+      # Requisito 2: Ejecutar Pruebas Unitarias
+      # Se usa el script "test" de package.json. Si el comando falla (exit 1), el flujo se detiene.
+      - name: Ejecutar Pruebas Unitarias
+        run: npm test
+
+      # ------------------------------------
+      # 3. DOCUMENTACIÓN (Generación)
+      # ------------------------------------
+      
+      # Requisito 3 & 4: Generar la documentación HTML con JSDoc
+      # Esto cumple la verificación de documentación (si npm run docs falla, el flujo se detiene)
+      - name: Generar la documentación (carpeta 'docs')
+        run: npm run docs
+
+      # ------------------------------------
+      # 4. DESPLIEGUE (CD)
+      # ------------------------------------
+
+      # Requisito 5: Desplegar automáticamente en Vercel
+      - name: Despliegue en Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          # VERCEL_TOKEN debe ser configurado como Secret en GitHub
+          vercel-token: ${{ secrets.VERCEL_TOKEN }} 
+          vercel-org-id: ${{ env.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
+          # El despliegue de Vercel debe apuntar a la carpeta base del proyecto
+          working-directory: ./
