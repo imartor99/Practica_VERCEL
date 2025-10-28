@@ -14,7 +14,7 @@ jobs:
   ci-cd-pipeline:
     runs-on: ubuntu-latest
 
-    # No definimos env: aquí; la acción de Vercel leerá los Secrets directamente.
+    # NOTA: No necesitamos definir 'env:' ya que accedemos a los Secrets directamente en la sección 'with:'.
 
     steps:
       - name: Checkout del repositorio
@@ -25,16 +25,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          # Usamos cache: 'npm' esperando encontrar package-lock.json
+          # Busca package-lock.json (el que generaste)
           cache: "npm"
 
       - name: Instalar dependencias (incluyendo JSDoc)
         run: npm install
-
-      - name: Debug - Verificar Path y NPM
-        run: |
-          echo "Current PATH: $PATH"
-          which npm
 
       # ------------------------------------
       # 2. VERIFICACIÓN Y PRUEBAS (CI)
@@ -52,7 +47,8 @@ jobs:
 
       # Requisito 2: Ejecutar Pruebas Unitarias
       - name: Ejecutar Pruebas Unitarias
-        run: npm test
+        # Usamos 'npm run test' para una ejecución más robusta
+        run: npm run test
 
       # ------------------------------------
       # 3. DOCUMENTACIÓN (Generación)
@@ -67,13 +63,4 @@ jobs:
       # 4. DESPLIEGUE (CD)
       # ------------------------------------
 
-      # Requisito 5: Desplegar automáticamente en Vercel
-      - name: Despliegue en Vercel (Solo carpeta DOCS)
-        uses: amondnet/vercel-action@v25
-        with:
-          # ACCESO CORRECTO A LOS SECRETS: Siempre por su nombre
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          # ¡CRÍTICO! Apuntamos el despliegue a la carpeta 'docs' generada.
-          working-directory: ./docs
+      # Re
