@@ -17,8 +17,8 @@ jobs:
     # Define variables de entorno para Vercel (deben coincidir con tus IDs)
     env:
       # Estos IDs deben obtenerse de la configuración de tu proyecto en Vercel
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }} 
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }} 
+      VERCEL_ORG_ID: ${{ secrets.Thih5mJ5Gc62a4nRh4VrGWtI }} 
+      VERCEL_PROJECT_ID: ${{ secrets.prj_hDomlRZKqb95DkamsmK5AVNSKzx1 }} 
 
     steps:
       - name: Checkout del repositorio
