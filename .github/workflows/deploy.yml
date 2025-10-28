@@ -31,6 +31,11 @@ jobs:
       - name: Instalar dependencias (incluyendo JSDoc)
         run: npm install
 
+      - name: Debug - Verificar Path y NPM
+        run: |
+          echo "Current PATH: $PATH"
+          which npm
+
       # ------------------------------------
       # 2. VERIFICACIÓN Y PRUEBAS (CI)
       # ------------------------------------
