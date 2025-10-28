@@ -13,12 +13,8 @@ on:
 jobs:
   ci-cd-pipeline:
     runs-on: ubuntu-latest
-    
-    # Define variables de entorno, accediendo a los Secrets por su NOMBRE
-    env:
-      # Estos son los NOMBRES EXACTOS de los Secrets configurados en GitHub
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }} 
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }} 
+
+    # No definimos env: aquí; la acción de Vercel leerá los Secrets directamente.
 
     steps:
       - name: Checkout del repositorio
@@ -28,8 +24,9 @@ jobs:
       - name: Configurar Node.js y Cachear
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm' 
+          node-version: "18"
+          # Usamos cache: 'npm' esperando encontrar package-lock.json
+          cache: "npm"
 
       - name: Instalar dependencias (incluyendo JSDoc)
         run: npm install
@@ -45,9 +42,9 @@ jobs:
             echo "::notice file=script.js::El archivo script.js existe. Continuamos."
           else
             echo "::error file=script.js::Error: El proyecto requiere el archivo script.js."
-            exit 1 # Detiene el flujo si no existe el archivo clave
+            exit 1
           fi
-          
+
       # Requisito 2: Ejecutar Pruebas Unitarias
       - name: Ejecutar Pruebas Unitarias
         run: npm test
@@ -55,9 +52,10 @@ jobs:
       # ------------------------------------
       # 3. DOCUMENTACIÓN (Generación)
       # ------------------------------------
-      
+
       # Requisito 3 & 4: Generar la documentación HTML con JSDoc
       - name: Generar la documentación (carpeta 'docs')
+        # Esto ejecuta 'npm run docs' y crea la carpeta 'docs'
         run: npm run docs
 
       # ------------------------------------
@@ -65,13 +63,12 @@ jobs:
       # ------------------------------------
 
       # Requisito 5: Desplegar automáticamente en Vercel
-      - name: Despliegue en Vercel
+      - name: Despliegue en Vercel (Solo carpeta DOCS)
         uses: amondnet/vercel-action@v25
         with:
-          # ACCEDE AL SECRET POR SU NOMBRE DIRECTAMENTE
-          vercel-token: ${{ secrets.VERCEL_TOKEN }} 
-          # ACCEDE A LAS VARIABLES DEFINIDAS EN LA SECCIÓN ENV:
-          vercel-org-id: ${{ env.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
-          # El despliegue de Vercel debe apuntar a la carpeta base del proyecto
-          working-directory: ./
+          # ACCESO CORRECTO A LOS SECRETS: Siempre por su nombre
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # ¡CRÍTICO! Apuntamos el despliegue a la carpeta 'docs' generada.
+          working-directory: ./docs
